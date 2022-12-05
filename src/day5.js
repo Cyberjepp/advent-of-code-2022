@@ -504,7 +504,8 @@ move 1 from 5 to 4
 move 3 from 2 to 7
 move 6 from 2 to 9`.split('\n');
 
-let crates = [
+// the initial crate state
+const CRATES_RAW = [
 	['R', 'G', 'J', 'B', 'T', 'V', 'Z'],
 	['J', 'R', 'V', 'L'],
 	['S', 'Q', 'F'],
@@ -516,29 +517,70 @@ let crates = [
 	['J', 'B', 'W', 'V', 'P']
 ];
 
+// ---- PART ONE ----
+console.log('Day 5, Part 1');
+
+// create a duplicate of the crate data
+let crates = JSON.parse(JSON.stringify(CRATES_RAW));
+
+// convert move data from its raw format
+let moves = [];
 for(let i = 0; i < MOVES_RAW.length; i++)
 {
 	let parts = MOVES_RAW[i].split(' ');
-	let move = {
+	moves.push({
 		count: parts[1],
 		from: parts[3],
 		to: parts[5]
-	};
+	});
+}
 
-	let stack = [];
-	for(let j = 0; j < move.count; j++)
+// execute each of the move steps
+for(let i = 0; i < moves.length; i++)
+{
+	// move each crate individually
+	for(let j = 0; j < moves[i].count; j++)
 	{
-		stack.push(crates[move.from - 1].pop())
-	}
-	for(let j = stack.length - 1; j >= 0; j--)
-	{
-		crates[move.to - 1].push(stack[j]);
+		crates[moves[i].to - 1].push(crates[moves[i].from - 1].pop());
 	}
 }
 
-let s = '';
+// format output
+let output = '';
 for(let i = 0; i < crates.length; i++)
 {
-	s += crates[i][crates[i].length-1];
+	output += crates[i].at(-1);
 }
-console.log(s);
+console.log(output);
+
+
+// ---- PART TWO ----
+console.log("\nDay 5, Part 2");
+
+// reset the crate data
+crates = JSON.parse(JSON.stringify(CRATES_RAW));
+
+// execute each of the move steps
+for(let i = 0; i < moves.length; i++)
+{
+	// get the crates that should be moved
+	let stack = [];
+	for(let j = 0; j < moves[i].count; j++)
+	{
+		stack.push(crates[moves[i].from - 1].pop());
+	}
+
+	// apply the crates in reverse order (so they remain the same)
+	for(let j = stack.length - 1; j >= 0; j--)
+	{
+		crates[moves[i].to - 1].push(stack[j]);
+	}
+}
+
+// format output
+output = '';
+for(let i = 0; i < crates.length; i++)
+{
+	output += crates[i].at(-1);
+}
+console.log(output);
