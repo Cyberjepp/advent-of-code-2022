@@ -999,21 +999,31 @@ let data = `54-59,17-62
 41-63,40-63
 87-90,89-90`.split('\n');
 
-let count = 0;
+let countPart1 = 0, countPart2 = 0;
 for(let i = 0; i < data.length; i++)
 {
+	// split string input out into its parts
 	let [group1, group2] = data[i].split(',');
 	let [g1min, g1max] = group1.split('-');
 	let [g2min, g2max] = group2.split('-');
 
+	// ensure numbers are not actually strings
 	g1min = parseInt(g1min);
 	g1max = parseInt(g1max);
 	g2min = parseInt(g2min);
 	g2max = parseInt(g2max);
 
-	if(g2min <= g1max && g2min >= g1min)
-		count++;
-	else if(g1min <= g2max && g1max >= g2min)
-		count++;
+	// check whether a range fully includes the other
+	if((g2min >= g1min && g2max <= g1max) || (g1min >= g2min && g1max <= g2max))
+		countPart1++;
+
+	// check whether the lowest number in a range is included anywhere in the other
+	if((g2min <= g1max && g2min >= g1min) || (g1min <= g2max && g1max >= g2min))
+		countPart2++;
 }
-console.log(count);
+
+// output counts
+console.log('Day 4, Part 1');
+console.log(countPart1);
+console.log("\nDay 4, Part 2");
+console.log(countPart2);
