@@ -299,6 +299,7 @@ TfdZgtmfDgqgvlLFFsFHvcvZ
 pphWQMVjQVVBWWjRlHlHnlcLDDhcnF
 JQwwWVPBwMJpJwpWwGBWNzrDzSSzfgTPqTSTTtSPgt`.split('\n');
 
+// the hardcoded priority values
 let priorities = {
 	'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8, 'i': 9, 'j': 10, 'k': 11, 'l': 12, 'm': 13,
 	'n': 14, 'o': 15, 'p': 16, 'q': 17, 'r': 18, 's': 19, 't': 20, 'u': 21, 'v': 22, 'w': 23, 'x': 24, 'y': 25, 'z': 26,
@@ -307,36 +308,72 @@ let priorities = {
 	'N': 40, 'O': 41, 'P': 42, 'Q': 43, 'R': 44, 'S': 45, 'T': 46, 'U': 47, 'V': 48, 'W': 49, 'X': 50, 'Y': 51, 'Z': 52
 };
 
-let p = 0;
-for(let i = 0; i < rucksacks.length; i += 3)
+console.log('Day 3, Part 1');
+let priorityTotal = 0;
+for(let i = 0; i < rucksacks.length; i++)
 {
-	let currentGroup = [rucksacks[i], rucksacks[i + 1], rucksacks[i + 2]];
+	// compartments are half of the rucksack (rucksacks always contain an even number of items)
+	let compartmentSize = rucksacks[i].length / 2;
 
-	let items = {};
-	for(let j = 0; j < currentGroup.length; j++)
+	// split the rucksack data out into its compartments
+	let compartments = [rucksacks[i].substring(0, compartmentSize), rucksacks[i].substring(compartmentSize)];
+
+	// for every item in the first compartment
+	let sharedItem = null;
+	for(let j = 0; j < compartments[0].length; j++)
 	{
-		let processedThisLoop = {};
-		for(let k = 0; k < currentGroup[j].length; k++)
+		// compare with every item in the second compartment
+		for(let k = 0; k < compartments[1].length; k++)
 		{
-			if(processedThisLoop.hasOwnProperty(currentGroup[j][k])) continue;
-
-			if(!items.hasOwnProperty(currentGroup[j][k]))
-			{
-				items[currentGroup[j][k]] = 0;
-			}
-
-			items[currentGroup[j][k]]++;
-			processedThisLoop[currentGroup[j][k]] = true;
+			// keep track of which item was shared
+			if(compartments[0][j] === compartments[1][k])
+				sharedItem = compartments[0][j];
 		}
 	}
 
+	// if a shared item was found, add its priority to the total
+	if(sharedItem !== null)
+	{
+		priorityTotal += priorities[sharedItem];
+	}
+}
+console.log(priorityTotal);
+
+console.log("\nDay 3, Part 2");
+priorityTotal = 0;
+for(let i = 0; i < rucksacks.length; i += 3)
+{
+	// process rucksacks in groups of three
+	let currentGroup = [rucksacks[i], rucksacks[i + 1], rucksacks[i + 2]];
+
+	// keep a tally of the number of rucksacks each item appears in
+	let items = {};
+	for(let r = 0; r < currentGroup.length; r++)
+	{
+		let processedThisLoop = {};
+		for(let k = 0; k < currentGroup[r].length; k++)
+		{
+			// skip over any duplicate items in the same rucksack
+			if(processedThisLoop.hasOwnProperty(currentGroup[r][k])) continue;
+
+			if(!items.hasOwnProperty(currentGroup[r][k]))
+			{
+				items[currentGroup[r][k]] = 0;
+			}
+
+			items[currentGroup[r][k]]++;
+			processedThisLoop[currentGroup[r][k]] = true;
+		}
+	}
+
+	// check the tally for any items that appear in all three rucksacks
 	let keys = Object.keys(items);
 	for(let l = 0; l < keys.length; l++)
 	{
 		if(items[keys[l]] === 3)
 		{
-			p += priorities[keys[l]];
+			priorityTotal += priorities[keys[l]];
 		}
 	}
 }
-console.log(p);
+console.log(priorityTotal);
